@@ -1,4 +1,7 @@
 ﻿using System.Data.Entity;
+using System.Data.Entity.Migrations;
+using System.Security.Cryptography.X509Certificates;
+using FizzWare.NBuilder;
 
 namespace AngularWebApiGrid.Models
 {
@@ -6,7 +9,17 @@ namespace AngularWebApiGrid.Models
     {
         protected override void Seed(DemoContext context)
         {
-            base.Seed(context);
+            var customers = Builder<Customer>.CreateListOfSize(200)
+                .All()
+                    .With(c => c.FirstName = Faker.Name.First())
+                    .With(c => c.LastName = Faker.Name.Last())
+                .Build();
+
+            foreach (var customer in customers)
+            {
+                context.Customers.AddOrUpdate(c => c.Id,
+                    customer);
+            }
         }
     }
 }

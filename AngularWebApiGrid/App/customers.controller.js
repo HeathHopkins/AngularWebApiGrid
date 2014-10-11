@@ -5,15 +5,19 @@
         .module('app')
         .controller('CustomersController', CustomersController);
 
-    CustomersController.$inject = ['$location']; 
+    CustomersController.$inject = ['Restangular']; 
 
-    function CustomersController($location) {
+    function CustomersController(Restangular) {
         /* jshint validthis:true */
         var vm = this;
-        vm.title = 'CustomersController';
+        vm.customers = [];
 
         activate();
 
-        function activate() { }
+        function activate() {
+            Restangular.all('customers').getList().then(function(customers) {
+                vm.customers = customers;
+            });
+        }
     }
 })();
