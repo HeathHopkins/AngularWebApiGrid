@@ -1,6 +1,9 @@
 ﻿<div ng-controller="CustomersController as vm">
-    <h1>Customers</h1>    
-    <p ng-repeat="customer in vm.customers">
-        {{ customer.FirstName + ' ' + customer.LastName }}
-    </p>
+    <h1>Customers</h1>
+    <table ng-table="vm.tableParams" class="table">
+        <tr ng-repeat="customer in $data">
+            <td data-title="'First Name'">{{customer.firstName}}</td>
+            <td data-title="'Last Name'">{{customer.lastName}}</td>
+        </tr>
+    </table>
 </div>
