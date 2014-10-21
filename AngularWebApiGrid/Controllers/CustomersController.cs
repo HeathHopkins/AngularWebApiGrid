@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Linq.Dynamic;
 using AngularWebApiGrid.Models;
 
 namespace AngularWebApiGrid.Controllers
@@ -19,17 +20,24 @@ namespace AngularWebApiGrid.Controllers
         }
 
         // GET api/customers
-        public PagedResult<Customer> Get(int pageNo = 1, int pageSize = 50)
+        public PagedResult<Customer> Get(int pageNo = 1, int pageSize = 50, [FromUri] string[] sort = null)
         {
             // Determine the number of records to skip
             int skip = (pageNo - 1) * pageSize;
 
+            IQueryable<Customer> queryable = demoContext.Customers;
+
+            // Add the sorting
+            if (sort != null)
+                queryable = queryable.ApplySorting(sort);
+            else
+                queryable = queryable.OrderBy(c => c.Id);
+
             // Get the total number of records
-            int totalItemCount = demoContext.Customers.Count();
+            int totalItemCount = queryable.Count();
 
             // Retrieve the customers for the specified page
-            var customers = demoContext.Customers
-                .OrderBy(c => c.LastName)
+            var customers = queryable
                 .Skip(skip)
                 .Take(pageSize)
                 .ToList();
