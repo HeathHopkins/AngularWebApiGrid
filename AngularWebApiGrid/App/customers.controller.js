@@ -5,11 +5,13 @@
         .module('app')
         .controller('CustomersController', CustomersController);
 
-    CustomersController.$inject = ['Restangular', 'ngTableParams'];
+    CustomersController.$inject = ['$scope', 'Restangular', 'ngTableParams'];
 
-    function CustomersController(Restangular, ngTableParams) {
+    function CustomersController($scope, Restangular, ngTableParams) {
         /* jshint validthis:true */
         var vm = this;
+
+        vm.search = '';
 
         vm.tableParams = new ngTableParams({
             page: 1,
@@ -24,7 +26,8 @@
                 Restangular.all('customers').getList({
                     pageNo: params.page(),
                     pageSize: params.count(),
-                    sort: params.orderBy()
+                    sort: params.orderBy(),
+                    search: vm.search
                 }).then(function (customers) {
                     // Tell ngTable how many records we have (so it can set up paging)
                     params.total(customers.paging.totalRecordCount);
@@ -37,9 +40,11 @@
             }
         });
 
-        activate();
-
-        function activate() {
-        }
+        // Watch for changes to the search text, so we can reload the table
+        $scope.$watch(angular.bind(vm, function () {
+            return vm.search;
+        }), function (value) {
+            vm.tableParams.reload();
+        });
     }
 })();

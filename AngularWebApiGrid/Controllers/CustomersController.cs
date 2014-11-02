@@ -20,12 +20,23 @@ namespace AngularWebApiGrid.Controllers
         }
 
         // GET api/customers
-        public PagedResult<Customer> Get(int pageNo = 1, int pageSize = 50, [FromUri] string[] sort = null)
+        public PagedResult<Customer> Get(int pageNo = 1, int pageSize = 50, [FromUri] string[] sort = null, string search = null)
         {
             // Determine the number of records to skip
             int skip = (pageNo - 1) * pageSize;
 
             IQueryable<Customer> queryable = demoContext.Customers;
+
+            // Apply the search
+            if (!String.IsNullOrEmpty(search))
+            {
+                string[] searchElements = search.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string searchElement in searchElements)
+                {
+                    string element = searchElement;
+                    queryable = queryable.Where(c => c.FirstName.Contains(element) || c.LastName.Contains(element));
+                }
+            }
 
             // Add the sorting
             if (sort != null)
